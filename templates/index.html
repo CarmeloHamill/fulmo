@@ -1,0 +1,153 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+
+	<script type="text/javascript" src="{{ url_for('static', filename='jquery-3.3.1.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='fulmo.js') }}"></script>
+	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+
+	<title>&#9889;fulmo&#9889;</title>
+	<meta name="description" content="A simple Lightning Network Interface" />
+	<meta name="author" content="Mike Marzigliano" />
+	<meta name="contact" content="marzig76@gmail.com" />
+</head>
+<body>
+	<h1>&#9889;fulmo: a minimalist c-lightning UI&#9889;</h1>
+	<div id="tabs">
+		<input id="shownodeinfo" type="button" value="Info" />
+		<input id="showwallet" type="button" value="On-chain Wallet" />
+		<input id="showchannelspeers" type="button" value="Channels" />
+		<input id="showpayments" type="button" value="Lightning Wallet" />
+		<input id="showhistory" type="button" value="Payment History" />
+		<input id="showinvoicehistory" type="button" value="Invoice History" />
+		<!-- <input id="showall" type="button" value="Show All" /> -->
+	</div>
+	<div id="getinfo" class="info">
+		<span id="getinfoTitle" class="subtitle">Lightning Wallet Info:</span>
+		<br />
+		<span id="getinfoText"></span>
+		<br />
+		<span id=earnedfeesTitle class="subtitle">Routing Income:</span>
+		<span id="earnedfees"></span>
+		<br />
+		<span id="getinfoBlurb">
+		<br />
+		<span class="subtitle">Quick Start:</span><br />
+		To get started, send some Bitcoin to this wallet by clicking on the <span class="keyword">On-chain Wallet</span> button, and generating a receive address.
+		<br /><br />
+		Once you have some funds, open up a channel from the <span class="keyword">Channels</span> button.
+		<br /><br />
+		After you have an open channel, you can generate and pay Lightning Network invoices from the <span class="keyword">Lighting Wallet</span> button.
+		</span>
+	</div>
+	<div id="channels" class="channels">
+		<span id="channelTitle">
+			<span class="subtitle">Channels:</span><br />
+			<!--
+			<a target="_blank"
+			   href="https://github.com/ElementsProject/lightning#different-states">
+				Channel State Definitions
+			</a>
+			-->
+			<br />
+		</span>
+		<span id="channelText"></span><br />
+	</div>
+	<div id="connections" class="channels">
+		<span id="connectionTitle">
+			<span class="subtitle">Open a Channel:</span><br />
+			<a target="_blank"
+			   href='https://graph.lndexplorer.com/'>Find a node to connect to
+			</a><br />
+		</span>
+		<span id="connectionText"></span><br />
+		<label for="connection">URI:</label>
+		<input id="connection" type="text" value="NodeID@IPaddress:Port" /><br />
+		<label for="connectionAmount">Satoshis:</label>
+		<input id="connectionAmount" type="number" value="100000" /><br />
+		<input id="connect" type="button" value="Connect" />
+	</div>
+	<div id="balances" class="balances">
+		<span id="onchainbalance"></span>
+		<span id="lightningbalance"></span>
+	</div>
+	<div id="funding" class="onchainwallet">
+		<span id="fundingTitle"><span class="subtitle">Receive:</span><br /></span>
+		<span id="fundingText"></span><br />
+		<label for="bech32">Bech32?</label>
+		<input id="bech32" type="checkbox" checked="checked"><br />
+		<label for="fundingQR">Generate QR Code?</label>
+		<input id="fundingQR" type="checkbox"/><br />
+		<input id="fundingButton" type="button" value="Generate Address"/>
+	</div>
+	<div id="withdraw" class="onchainwallet">
+		<span id="withdrawTitle"><span class="subtitle">Send:</span><br /></span>
+		<span id="withdrawText"></span><br />
+		<label for="withdrawAddress">Recipient:</label>
+		<input id="withdrawAddress" type="text" value=""/><br />
+		<label for="withdrawAmount">Amount (satoshis):</label>
+		<input id="withdrawAmount" type="text" value=""/><br />
+		<label for="withdrawAll">Send all on-chain funds?</label>
+		<input id="withdrawAll" type="checkbox"/><br /><br />
+		<label for="feerate">Fee Rate:</label>
+		<select id="feerate" name="feerate">
+			<option value="normal" selected="selected">Normal</option>
+			<option value="urgent">Urgent</option>
+			<option value="slow">Slow</option>
+		</select><br />
+		<input id="withdrawButton" type="button" value="Send"/>
+	</div>
+	<div id="invoices" class="lightningwallet">
+		<span id="invoiceTitle"><span class="subtitle">Create a Lightning Invoice:</span><br /></span>
+		<span id="invoiceText"></span><br />
+		<label for="invoiceAmont">MilliSatoshis:</label>
+		<input id="invoiceAmount" type="text" value="100000"/><br />
+		<label for="invoiceDescription">Payment Description:</label>
+		<input id="invoiceDescription" type="text" value="pizza"/><br />
+		<label for="expire">Expires In:</label>
+		<select id="expire" name="expire">
+			<option value="3600" selected="selected">1 Hour</option>
+			<option value="21600">6 Hours</option>
+			<option value="43200">12 Hours</option>
+			<option value="86400">1 Day</option>
+			<option value="259200">3 Days</option>
+			<option value="604800">1 Week</option>
+		</select><br />
+		<label for="invoiceQR">Generate QR Code?</label>
+		<input id="invoiceQR" type="checkbox"/><br />
+		<input id="createInvoice" type="button" value="Create Invoice" />
+	</div>
+	<div id="payment" class="lightningwallet">
+		<span id="paymentTitle"><span class="subtitle">Pay a Lightning Invoice:</span><br /></span>
+		<span id="paymentText"></span><br />
+		<textarea id="bolt11"></textarea><br />
+		<div id="noAmount">
+			<br />
+			This invoice has no amount specified.
+			Please enter the amount you want to pay:
+			<br /><br />
+			<label for="payInvoiceAmount">MilliSatoshis:</label>
+			<input id="payInvoiceAmount" type="number"><br /><br />
+		</div>
+		<!-- No need for the decode button since we're handling it through the paste event
+		<input id="decodebolt11" type="button" value="Decode Payment" /> -->
+		<input id="paybolt11" type="button" value="Send Payment" />
+	</div>
+	<div id="history" class="history">
+		<span id="historyTitle"><span class="subtitle"><br />Payments Sent:</span></span>
+		<span id="historyText"></span>
+	</div>
+	<div id="invoicehistory" class="invoicehistory">
+		<span id="invoiceHistoryTitle"><span class="subtitle"><br />Invoices:</span></span>
+		<span id="invoiceHistoryText"></span>
+		<input id="delexpiredinvoice" type="button" value="Delete Expired Invoices" />
+	</div>
+	<div id="buttons" class="buttons">
+		<input id="clear" type="button" value="Clear" />
+		<input id="stop" type="button" value="Stop c-lightning daemon" />
+		<!-- <input id="help" type="button" value="Help" /> -->
+	</div>
+</body>
+</html>
